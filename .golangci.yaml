@@ -1,0 +1,243 @@
+---
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - cyclop
+    - depguard
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gci
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - err113
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - mnd
+    - gomoddirectives
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - importas
+    - ineffassign
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - staticcheck
+    - stylecheck
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - unused
+    - whitespace
+    - wrapcheck
+    # - gochecknoglobals
+    # - paralleltest
+    # - testpackage
+
+linters-settings:
+  stylecheck:
+    checks:
+      - "-ST1000"
+  revive:
+    rules:
+      - name: exported
+        disabled: true
+  depguard:
+    rules:
+      prevent_unmaintained_packages:
+        list-mode: original
+        deny:
+          - pkg: io/ioutil
+            desc: "replaced by io and os packages since Go 1.16: https://tip.golang.org/doc/go1.16#ioutil"
+          - pkg: github.com/sirupsen/logrus
+  dupl:
+    threshold: 60
+  funlen:
+    lines: 50
+    statements: 35
+  gci:
+    sections:
+      - Standard
+      - Default
+      - Prefix(perceptyx.com)
+  goconst:
+    min-len: 2
+    min-occurrences: 3
+    match-constant: true
+    numbers: true
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    settings:
+      hugeParam:
+        sizeThreshold: 80  # let's try to reduce this
+      # disabled-checks:
+      # - whyNoLint
+  gocyclo:
+    min-complexity: 10
+  godox:
+    keywords:  # default keywords are TODO, BUG, and FIXME
+      - BUG
+      - FIXME
+      - HACK
+  goimports:
+    local-prefixes: perceptyx.com
+      # gomnd:
+      # settings:
+      # mnd:
+      # don't include the "operation" and "assign"
+    # checks: argument,case,condition,return
+  govet:
+    enable:
+      - shadow
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  lll:
+    line-length: 80
+    tab-width: 2
+  misspell:
+    locale: UK
+    ignore-words:
+      - color  # used by UDS, out of our control
+  nestif:
+    min-complexity: 6
+  nolintlint:
+    # report any unused nolint directives
+    allow-unused: false
+    # require an explanation for nolint directives
+    require-explanation: true
+    # require nolint directives to be specific
+    #   about which linter is being skipped
+    require-specific: true
+
+issues:
+  exclude-rules:
+    - path: handlers.go
+      linters:
+        - revive
+    - path: cmd/*  # allow commands to use Printf/Println
+      linters:
+        - forbidigo
+    - path: internal/api/surveys_test\.go
+      linters:
+        - dupl  # similar data tested over and over
+  exclude-use-default: false
+  exclude:
+    # - declaration of "(err|ctx)" shadows declaration at
+
+    # TODO - try to remove as many of these as possible
+    # list taken from "golangci-lint run --help"
+
+    # EXC0001 errcheck: Almost all programs ignore errors on these functions
+    # and in most cases it's ok
+    # - >-
+    # Error return value of
+    # .((os\.)?std(out|err)\..*|.*Close|.*Flush|
+    #   os\.Remove(All)?|.*print(f|ln)?|os\.(Un)?Setenv).
+    # is not checked
+    # - Error return value of .(.*Close|os\.Setenv). is not checked
+
+    # EXC0002 golint: Annoying issue about not having a comment. The rare
+    # codebase has such comments
+    # - >-
+    # (comment on exported (method|function|type|const)|should
+    # have( a package)? comment|comment should be of the form)
+
+    # EXC0003 golint: False positive when tests are defined in package 'test'
+    # - >-
+    # func name will be used as test\.Test.* by other packages,
+    # and that stutters; consider calling this
+
+    # EXC0004 govet: Common false positives
+    # - (possible misuse of unsafe.Pointer|should have signature)
+
+    # EXC0005 staticcheck: Developers tend to write in C-style with an explicit
+    # 'break' in a 'switch', so it's ok to ignore
+    # - ineffective break statement. Did you mean to break out of the outer loop
+
+    # EXC0006 gosec: Too many false-positives on 'unsafe' usage
+    # - Use of unsafe calls should be audited
+
+    # EXC0007 gosec: Too many false-positives for parametrized shell calls
+    # - Subprocess launch(ed with variable|ing should be audited)
+    # - Subprocess launched with variable
+
+    # EXC0008 gosec: Duplicated errcheck checks
+    # - (G104|G307)
+    - G402
+
+    # EXC0009 gosec: Too many issues in popular repos
+    # - >-
+    # (Expect directory permissions to be 0750 or
+    # less|Expect file permissions to be 0600 or less)
+
+    # EXC0010 gosec: False positive is triggered by 'src, err :=
+    # ioutil.ReadFile(filename)'
+    - Potential file inclusion via variable
+
+    # EXC0011 stylecheck: Annoying issue about not having a comment. The rare
+    # codebase has such comments
+    - >-
+      (comment on exported (method|function|type|const)|should
+      have( a package)? comment|comment should be of the form)
+
+      # EXC0012 revive: Annoying issue about not having a comment. The rare
+      # codebase has such comments
+      # - >-
+      # exported (.+) should have comment( \(or a comment on this block\))?
+      # or be unexported
+
+      # EXC0013 revive: Annoying issue about not having a comment. The rare
+      # codebase has such comments
+      # - package comment should be of the form "(.+)...
+
+      # EXC0014 revive: Annoying issue about not having a comment. The rare
+      # codebase has such comments
+      # - comment on exported (.+) should be of the form "(.+)..."
+
+      # EXC0015 revive: Annoying issue about not having a comment. The rare
+      # codebase has such comments
+      # - >-
+      # should have a package comment,
+    # unless it's in another file for this package
+
+    # run:
+    # skip-dirs:
+    # - test/testdata_etc

@@ -1,0 +1,25 @@
+[DB]
+Name = "rd_clone_api"
+Port = ":5432"
+User = "postgres"
+Password = "mypass123"
+Host = "localhost"
+
+[SMTP]
+SENDER_MAIL = true
+HOST = "smtp.mailtrap.io"
+PORT = 2525
+USERNAME = "53958e47151985"
+PASSWORD = "5764b30f020c87"
+
+[SERVER]
+Address = "localhost:8080"
+Environment = "development"
+
+[LOGGER]
+Level = "info"
+
+[JWT]
+Expiration = 3600
+Key = "agvdsf2fgja409821saljk1"
+
