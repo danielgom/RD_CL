@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
-	"sync"
 	"time"
 
 	"github.com/spf13/viper"
@@ -57,36 +56,36 @@ type FileSystem struct {
 	BaseDir string `mapstructure:"BaseDir"`
 }
 
+var cfg *Config
+
 // Load gets the configuration in from .env files and stores the in Config struct.
 func Load() *Config {
-	var c Config
-	var once sync.Once
+	if cfg == nil {
+		cfgPath := os.Getenv("CONFIG_PATH")
 
-	once.Do(func() {
-		dir, err := os.Getwd()
-		if err != nil {
-			panic("cannot get current working directory")
-		}
-
-		viper.AddConfigPath(dir + "/internal/config/cfg")
+		viper.AddConfigPath(cfgPath + "/internal/config/cfg")
 		viper.SetConfigName("config")
 		viper.SetConfigType("toml")
 		viper.AutomaticEnv()
 
-		err = viper.ReadInConfig()
+		err := viper.ReadInConfig()
 		if err != nil {
 			log.Fatalln("Could not read configuration:", err.Error())
 		}
 
-		err = viper.Unmarshal(&c)
+		err = viper.Unmarshal(&cfg)
 		if err != nil {
 			log.Fatalln("Could not unmarshal to Config struct:", err.Error())
 		}
 
-		c.setBaseDir()
-	})
+		cfg.setBaseDir()
+	}
 
-	return &c
+	return cfg
+}
+
+func (c *Config) SetDBName(dbName string) {
+	c.DB.Name = dbName
 }
 
 func (c *Config) setBaseDir() {
@@ -95,7 +94,7 @@ func (c *Config) setBaseDir() {
 	}
 
 	if c.IsDevelopment() || c.IsCI() {
-		log.Println("Getting BaseDir from git")
+		slog.Info("Getting BaseDir from git")
 		cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 		var stdout bytes.Buffer
 		cmd.Stdout = &stdout

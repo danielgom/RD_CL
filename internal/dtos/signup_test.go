@@ -14,18 +14,20 @@ func TestBuildRegisterResponse(t *testing.T) {
 	currentTime := time.Now()
 
 	want := &RegisterResponse{
-		Username:  "daniel",
+		Name:      "Daniel",
+		LastName:  "Gomez",
 		Email:     "dga_355@hotmail.com",
 		CreatedAt: currentTime,
-		Enabled:   false,
+		Enabled:   0,
 	}
 
 	response := BuildRegisterResponse(&models.User{
 		ID:        1,
-		Username:  "daniel",
+		Name:      "Daniel",
+		LastName:  "Gomez",
 		Email:     "dga_355@hotmail.com",
 		CreatedAt: currentTime,
-		Enabled:   false,
+		Enabled:   0,
 	})
 
 	require.Equal(t, want, response)

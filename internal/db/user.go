@@ -6,6 +6,7 @@ import (
 	"RD-Clone-NAPI/internal/models"
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors"
@@ -24,7 +25,7 @@ func NewUserRepository(conn *pgxpool.Pool) UserRepository {
 
 // FindByUsername finds a user by its username.
 func (r *userRepo) FindByUsername(ctx context.Context, uName string) (*models.User, error) {
-	return r.findUser(ctx, `SELECT * FROM users WHERE username=$1`, uName)
+	return r.findUser(ctx, `SELECT * FROM users WHERE name=$1`, uName)
 }
 
 // FindByEmail finds a user by its email.
@@ -34,8 +35,8 @@ func (r *userRepo) FindByEmail(ctx context.Context, email string) (*models.User,
 
 // Save persists a user to the DB.
 func (r *userRepo) Save(ctx context.Context, user *models.User) (*models.User, error) {
-	row := r.DB.QueryRow(ctx, `INSERT INTO users("username", "password", "email", "created_at", "updated_at", "enabled") 
-		VALUES($1, $2, $3, $4, $5, $6) RETURNING id`, user.Username, user.Password, user.Email,
+	row := r.DB.QueryRow(ctx, `INSERT INTO users("name", "last_name", "password", "email", "created_at", "updated_at", "enabled") 
+		VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`, user.Name, user.LastName, user.Password, user.Email,
 		user.CreatedAt, user.UpdatedAt, user.Enabled)
 
 	err := row.Scan(&user.ID)
@@ -47,9 +48,8 @@ func (r *userRepo) Save(ctx context.Context, user *models.User) (*models.User, e
 }
 
 func (r *userRepo) Update(ctx context.Context, user *models.User) error {
-	_, err := r.DB.Exec(ctx, `UPDATE users SET password=$2, email=$3, updated_at=$4, enabled=$5 WHERE username=$1`,
-		user.Username, user.Password, user.Email, user.UpdatedAt, user.Enabled)
-
+	_, err := r.DB.Exec(ctx, `UPDATE users SET password=$2, email=$3, updated_at=$4, enabled=$5 WHERE email=$1`,
+		user.Email, user.Password, user.Email, user.UpdatedAt, user.Enabled)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
@@ -60,7 +60,7 @@ func (r *userRepo) Update(ctx context.Context, user *models.User) error {
 func (r *userRepo) findUser(ctx context.Context, query string, args ...any) (*models.User, error) {
 	rows, err := r.DB.Query(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find user: %w", err)
 	}
 
 	defer rows.Close()
@@ -70,7 +70,7 @@ func (r *userRepo) findUser(ctx context.Context, query string, args ...any) (*mo
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errUsrNotFound
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to get user row: %w", err)
 	}
 
 	return usr, nil

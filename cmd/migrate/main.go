@@ -21,10 +21,10 @@ func main() {
 	}
 	fmt.Printf("Migrating database: %s\n", dbname)
 
-	migrateFunc := MigrateDB
+	migrateFunc := config.MigrateDB
 	if *recreate {
 		fmt.Printf("Rebuilding database: %s\n", dbname)
-		migrateFunc = RecreateDB
+		migrateFunc = config.RecreateDB
 	}
 
 	err := migrateFunc(dbname)

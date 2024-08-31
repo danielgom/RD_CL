@@ -1,17 +1,18 @@
 package api
 
 import (
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
+
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 )
 
 type Error struct {
 	Err  error `json:"-"`
 	Code int   `json:"-"`
 
-	RequestID string `json:"request_id,omitempty"`
+	RequestID string `json:"request_id"`
 	Message   string `json:"error,omitempty"`
 	Reason    string `json:"reason,omitempty"`
 }
@@ -34,7 +35,7 @@ func internalServerError(err error) *Error {
 }
 
 func userError(msg, reason string) *Error {
-	slog.Warn("invalid request", "msg", msg)
+	slog.Error("invalid request", "msg", msg, "reason", reason)
 	return &Error{
 		Code:    http.StatusBadRequest,
 		Message: msg,

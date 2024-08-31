@@ -15,7 +15,7 @@ type ServiceFactory struct {
 
 func NewFactory() *ServiceFactory {
 	c := config.Load()
-	dbPool, err := config.NewDB(c)
+	dbPool, err := config.NewDB(c.DB.Name)
 	if err != nil {
 		log.Fatal(err)
 	}

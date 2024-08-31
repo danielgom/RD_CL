@@ -3,12 +3,13 @@ package security
 import (
 	"RD-Clone-NAPI/internal/config"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // GenerateTokenWithExp generates a JWT with an expiration of 1 hour (exp time comes from the config).
-func GenerateTokenWithExp(username string) (string, time.Time, error) {
+func GenerateTokenWithExp(email string) (string, time.Time, error) {
 	jwtConfig := config.Load().JWT
 
 	currentTime := time.Now().Local()
@@ -18,12 +19,11 @@ func GenerateTokenWithExp(username string) (string, time.Time, error) {
 		ExpiresAt: jwt.NewNumericDate(expirationDate),
 		IssuedAt:  jwt.NewNumericDate(currentTime),
 		Issuer:    "GO-Reddit-CL",
-		Subject:   username,
+		Subject:   email,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	signedToken, err := token.SignedString([]byte(jwtConfig.Key))
-
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("could not generate JWT %w please try again", err)
 	}

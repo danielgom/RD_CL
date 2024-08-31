@@ -1,15 +1,16 @@
-package main
+package config
 
 import (
-	"RD-Clone-NAPI/internal/config"
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"path/filepath"
+
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file" // driver for migrate
-	"log"
-	"path/filepath"
+	_ "github.com/lib/pq"                                // driver for migrat
 )
 
 // RecreateDB recreates all the DB architecture from /schema .sql files.
@@ -22,9 +23,9 @@ func RecreateDB(dbname string) error {
 
 // MigrateDB creates all the DB architecture from /schema .sql files.
 func MigrateDB(dbname string) (err error) {
-	connString := config.PsqlConnString(dbname)
+	connString := PsqlConnString(dbname)
 
-	db, err := sql.Open("postgres", connString+"?sslmode=disable")
+	db, err := sql.Open("postgres", connString)
 	if err != nil {
 		return fmt.Errorf("failed to connect to postgres: %w", err)
 	}
@@ -39,7 +40,7 @@ func MigrateDB(dbname string) (err error) {
 		}
 	}()
 
-	conf := config.Load()
+	conf := Load()
 	migrationDir := filepath.Join(conf.FileSystem.BaseDir, "schema")
 	log.Println("migration dir:", migrationDir)
 
@@ -65,7 +66,7 @@ func MigrateDB(dbname string) (err error) {
 }
 
 func makeDB(dbname string) (err error) {
-	connString := config.PsqlConnString(dbname)
+	connString := PsqlConnString()
 
 	db, err := sql.Open("postgres", connString)
 	if err != nil {
@@ -89,31 +90,6 @@ func makeDB(dbname string) (err error) {
 	_, err = db.Exec("create database " + dbname)
 	if err != nil {
 		return fmt.Errorf("failed to create database %s: %w", dbname, err)
-	}
-
-	return nil
-}
-
-func dropDB(dbname string) (err error) {
-	connString := config.PsqlConnString(dbname)
-
-	db, err := sql.Open("postgres", connString)
-	if err != nil {
-		return fmt.Errorf("failed to connect to postgres: %w", err)
-	}
-
-	defer func() {
-		if closeErr := db.Close(); closeErr != nil {
-			if err != nil {
-				err = errors.Join(err, closeErr)
-			} else {
-				err = closeErr
-			}
-		}
-	}()
-	_, err = db.Exec("drop database if exists " + dbname + " with (FORCE)")
-	if err != nil {
-		return fmt.Errorf("failed to drop database %s: %w", dbname, err)
 	}
 
 	return nil

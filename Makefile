@@ -1,8 +1,9 @@
 .PHONY: test lint image
 
-# Test with coverage (dev/local environment)
-testL: genM
-	@go test ./... --cover -v
+TESTS ?= ./...
+
+test:
+	@go test -count 1 -v $(TESTS)
 
 # Test with coverage (CI)
 testCI:

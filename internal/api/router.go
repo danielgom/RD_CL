@@ -2,12 +2,14 @@ package api
 
 import (
 	"RD-Clone-NAPI/internal/config"
+	"net/http"
+
 	services "RD-Clone-NAPI/internal/svc"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v2"
 	"github.com/go-chi/render"
-	"net/http"
 )
 
 func (a *API) Router() http.Handler {
@@ -17,6 +19,7 @@ func (a *API) Router() http.Handler {
 	r.Use(httplog.RequestLogger(routerLogger()))
 	r.Use(middleware.Recoverer)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
+	r.Use(JWTMiddleware())
 
 	factory := services.NewFactory()
 

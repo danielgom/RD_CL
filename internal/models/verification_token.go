@@ -6,5 +6,5 @@ type VerificationToken struct {
 	ID         int       `db:"id,omitempty"`
 	Token      string    `db:"token"`
 	User       *User     `db:"user"`
-	ExpiryDate time.Time `db:"expiry_date"`
+	ExpiryDate time.Time `db:"expires_at"`
 }

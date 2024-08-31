@@ -9,9 +9,7 @@ import (
 	"net/http"
 )
 
-var (
-	errInvalidBody = errors.New("invalid request body")
-)
+var errInvalidBody = errors.New("invalid request body")
 
 func shouldBindIntoAndValidate[T any](r *http.Request, val *T, v *validator.CustomValidator) error {
 	err := json.NewDecoder(r.Body).Decode(val)

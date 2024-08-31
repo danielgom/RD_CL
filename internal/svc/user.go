@@ -6,20 +6,19 @@ import (
 	"RD-Clone-NAPI/internal/models"
 	"RD-Clone-NAPI/internal/security"
 	"context"
+	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"net/mail"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
 	verificationTokenExpiration = 24
 )
 
-var (
-	errFailedPasswordVerification = errors.New("invalid password")
-)
+var errFailedPasswordVerification = errors.New("invalid password")
 
 type userSvc struct {
 	userDB  db.UserRepository
@@ -42,16 +41,17 @@ func (u *userSvc) SignUp(ctx context.Context, req *dtos.RegisterRequest,
 
 	currentTime := time.Now().Local()
 	user := &models.User{
-		Username:  req.Username,
+		Name:      req.Name,
+		LastName:  req.LastName,
 		Password:  pass,
 		Email:     req.Email,
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
 	}
 
-	user, saveErr := u.userDB.Save(ctx, user)
-	if saveErr != nil {
-		return nil, saveErr
+	user, err = u.userDB.Save(ctx, user)
+	if err != nil {
+		return nil, fmt.Errorf("svc failed to save user: %w", err)
 	}
 
 	_, err = u.generateVerificationToken(ctx, user)
@@ -63,14 +63,15 @@ func (u *userSvc) SignUp(ctx context.Context, req *dtos.RegisterRequest,
 }
 
 func (u *userSvc) Get(ctx context.Context, username string) (*dtos.UserResponse, error) {
-	user, commonError := u.userDB.FindByUsername(ctx, username)
-	if commonError != nil {
-		return nil, commonError
+	user, err := u.userDB.FindByUsername(ctx, username)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find user: %w", err)
 	}
 
 	return &dtos.UserResponse{
 		ID:        user.ID,
-		Username:  user.Username,
+		Name:      user.Name,
+		LastName:  user.LastName,
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
@@ -80,18 +81,17 @@ func (u *userSvc) Get(ctx context.Context, username string) (*dtos.UserResponse,
 
 // VerifyAccount verifies the account.
 func (u *userSvc) VerifyAccount(ctx context.Context, tStr string) error {
-	token, verErr := u.tokenDB.FindByToken(ctx, tStr)
-	if verErr != nil {
-		return verErr
+	token, err := u.tokenDB.FindByToken(ctx, tStr)
+	if err != nil {
+		return fmt.Errorf("failed to find verification token: %w", err)
 	}
 
-	token.User.Enabled = true
+	token.User.Enabled = 1
 	token.User.UpdatedAt = time.Now()
 
-	updateErr := u.userDB.Update(ctx, token.User)
-
-	if updateErr != nil {
-		return updateErr
+	err = u.userDB.Update(ctx, token.User)
+	if err != nil {
+		return fmt.Errorf("unable to enable user: %w", err)
 	}
 
 	return nil
@@ -117,7 +117,7 @@ func (u *userSvc) Login(ctx context.Context, loginReq *dtos.LoginRequest) (*dtos
 		return nil, errFailedPasswordVerification
 	}
 
-	JWT, expDate, err := security.GenerateTokenWithExp(user.Username)
+	JWT, expDate, err := security.GenerateTokenWithExp(user.Email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate token while login: %w", err)
 	}
@@ -127,11 +127,12 @@ func (u *userSvc) Login(ctx context.Context, loginReq *dtos.LoginRequest) (*dtos
 		return nil, fmt.Errorf("failed to create refresh token: %w", err)
 	}
 
-	return dtos.BuildLoginResponse(user.Username, user.Email, JWT, refreshToken, expDate), nil
+	return dtos.BuildLoginResponse(user.Email, user.Email, JWT, refreshToken, expDate), nil
 }
 
 func (u *userSvc) RefreshToken(ctx context.Context, rtReq *dtos.RefreshTokenRequest) (*dtos.RefreshTokenResponse,
-	error) {
+	error,
+) {
 	err := u.rtSvc.Validate(ctx, rtReq.RefreshToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate refresh token: %w", err)
