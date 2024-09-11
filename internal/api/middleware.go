@@ -17,7 +17,8 @@ var (
 	errUnexpectedJWTSigningMethod = errors.New("unexpected jwt signing method")
 
 	URLsToSkip = map[string]struct{}{
-		"/v1/health": {},
+		"/v1/health":      {},
+		"/v1/user/signup": {},
 	}
 )
 
