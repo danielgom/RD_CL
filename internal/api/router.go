@@ -1,18 +1,17 @@
 package api
 
 import (
-	"RD-Clone-NAPI/internal/config"
 	"net/http"
 
+	"RD-Clone-NAPI/internal/config"
 	services "RD-Clone-NAPI/internal/svc"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v2"
 	"github.com/go-chi/render"
 )
 
-func (a *API) Router() http.Handler {
+func (a *API) Router(serviceFactory *services.ServiceFactory) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -21,11 +20,9 @@ func (a *API) Router() http.Handler {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 	r.Use(JWTMiddleware())
 
-	factory := services.NewFactory()
-
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", getHealth)
-		NewUserHandler(factory.UserService, a).Register(r)
+		NewUserHandler(serviceFactory.UserService, a).Register(r)
 	})
 
 	return r

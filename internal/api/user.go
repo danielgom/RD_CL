@@ -1,11 +1,10 @@
 package api
 
 import (
-	"RD-Clone-NAPI/internal/dtos"
 	"net/http"
 
+	"RD-Clone-NAPI/internal/dtos"
 	services "RD-Clone-NAPI/internal/svc"
-
 	"github.com/go-chi/chi/v5"
 )
 
@@ -22,7 +21,7 @@ func NewUserHandler(svc services.UserService, api *API) *UserHandler {
 
 // SignUp is used to create a new user.
 //
-//nolint:dupl // No hard duplicates
+
 func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var req dtos.RegisterRequest
 
@@ -57,7 +56,7 @@ func (h *UserHandler) VerifyAccount(w http.ResponseWriter, r *http.Request) {
 
 // Login returns a JWT based on the user that has been logged in.
 //
-//nolint:dupl // No hard duplicates
+
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req dtos.LoginRequest
 
@@ -76,7 +75,6 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	renderJSON201(w, r, response)
 }
 
-//nolint:dupl // No hard duplicates
 func (h *UserHandler) refreshToken(w http.ResponseWriter, r *http.Request) {
 	var req dtos.RefreshTokenRequest
 

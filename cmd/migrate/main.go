@@ -2,12 +2,12 @@
 package main
 
 import (
-	"RD-Clone-NAPI/internal/config"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
 
+	"RD-Clone-NAPI/internal/config"
 	"github.com/golang-migrate/migrate/v4"
 )
 

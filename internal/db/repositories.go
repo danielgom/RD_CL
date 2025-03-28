@@ -1,8 +1,9 @@
 package db
 
 import (
-	"RD-Clone-NAPI/internal/models"
 	"context"
+
+	"RD-Clone-NAPI/internal/models"
 )
 
 // UserRepository serves as a middleware to call our users table.

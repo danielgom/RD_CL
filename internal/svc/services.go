@@ -1,11 +1,9 @@
 package services
 
 import (
-	"RD-Clone-NAPI/internal/config"
-	"RD-Clone-NAPI/internal/db"
-	"RD-Clone-NAPI/internal/dtos"
 	"context"
-	"log"
+
+	"RD-Clone-NAPI/internal/dtos"
 )
 
 type ServiceFactory struct {
@@ -13,19 +11,13 @@ type ServiceFactory struct {
 	RefreshTokenService RefreshTokenService
 }
 
-func NewFactory() *ServiceFactory {
-	c := config.Load()
-	dbPool, err := config.NewDB(c.DB.Name)
-	if err != nil {
-		log.Fatal(err)
+func NewFactory(userService UserService, refreshTokenService RefreshTokenService) *ServiceFactory {
+	if userService == nil {
+		panic("userService is required")
 	}
-
-	userRepository := db.NewUserRepository(dbPool)
-	tokenRepository := db.NewTokenRepository(dbPool)
-	refreshTokenRepository := db.NewRTRepository(dbPool)
-
-	refreshTokenService := NewRefreshTokenService(refreshTokenRepository)
-	userService := NewUserService(userRepository, tokenRepository, refreshTokenService)
+	if refreshTokenService == nil {
+		panic("refreshTokenService is required")
+	}
 
 	return &ServiceFactory{
 		UserService:         userService,

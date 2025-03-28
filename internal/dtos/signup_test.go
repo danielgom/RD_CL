@@ -1,10 +1,10 @@
 package dtos
 
 import (
-	"RD-Clone-NAPI/internal/models"
 	"testing"
 	"time"
 
+	"RD-Clone-NAPI/internal/models"
 	"github.com/stretchr/testify/require"
 )
 

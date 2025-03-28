@@ -12,7 +12,7 @@ linters:
     - errcheck
     - errorlint
     - exhaustive
-    - exportloopref
+    - copyloopvar
     - forbidigo
     - forcetypeassert
     - funlen
@@ -79,7 +79,7 @@ linters-settings:
             desc: "replaced by io and os packages since Go 1.16: https://tip.golang.org/doc/go1.16#ioutil"
           - pkg: github.com/sirupsen/logrus
   dupl:
-    threshold: 60
+    threshold: 150
   funlen:
     lines: 50
     statements: 35

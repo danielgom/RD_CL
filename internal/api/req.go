@@ -1,12 +1,13 @@
 package api
 
 import (
-	"RD-Clone-NAPI/internal/api/validator"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
+
+	"RD-Clone-NAPI/internal/api/validator"
 )
 
 var errInvalidBody = errors.New("invalid request body")

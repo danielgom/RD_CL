@@ -1,11 +1,11 @@
 package db
 
 import (
-	"RD-Clone-NAPI/internal/db/utils"
-	"RD-Clone-NAPI/internal/models"
 	"context"
 	"fmt"
 
+	"RD-Clone-NAPI/internal/db/utils"
+	"RD-Clone-NAPI/internal/models"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -34,7 +34,7 @@ func (r *refreshTokenRepo) Save(ctx context.Context, token *models.RefreshToken)
 
 // FindByToken looks for a refresh token in the DB.
 //
-//nolint:dupl // No hard duplicates
+
 func (r *refreshTokenRepo) FindByToken(ctx context.Context, token string) (*models.RefreshToken, error) {
 	rows, err := r.DB.Query(ctx, `SELECT id,token,expires_at FROM refresh_token WHERE token=$1`, token)
 	if err != nil {

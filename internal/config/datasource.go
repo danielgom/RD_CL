@@ -18,8 +18,8 @@ const (
 
 var intPool *pgxpool.Pool
 
-// NewDB returns a pool from DB configuration.
-func NewDB(dbName string) (*pgxpool.Pool, error) {
+// NewDBPool returns a pool from DB configuration.
+func NewDBPool(dbName string) (*pgxpool.Pool, error) {
 	connPool, err := pgxpool.New(context.Background(), PsqlConnString(dbName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to the database: %w", err)

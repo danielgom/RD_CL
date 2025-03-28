@@ -2,11 +2,11 @@
 package db
 
 import (
-	"RD-Clone-NAPI/internal/db/utils"
-	"RD-Clone-NAPI/internal/models"
 	"context"
 	"fmt"
 
+	"RD-Clone-NAPI/internal/db/utils"
+	"RD-Clone-NAPI/internal/models"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors"

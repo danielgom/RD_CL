@@ -19,7 +19,10 @@ func Hash(str string) (string, error) {
 }
 
 // CheckHash checks whether the password provided is the correct one.
-func CheckHash(str, hashed string) bool {
+func CheckHash(str, hashed string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(str))
-	return err == nil
+	if err != nil {
+		return fmt.Errorf("could not compare hash: %w", err)
+	}
+	return nil
 }

@@ -1,24 +1,21 @@
 package services
 
 import (
-	"RD-Clone-NAPI/internal/db"
-	"RD-Clone-NAPI/internal/dtos"
-	"RD-Clone-NAPI/internal/models"
-	"RD-Clone-NAPI/internal/security"
 	"context"
-	"errors"
 	"fmt"
 	"net/mail"
 	"time"
 
+	"RD-Clone-NAPI/internal/db"
+	"RD-Clone-NAPI/internal/dtos"
+	"RD-Clone-NAPI/internal/models"
+	"RD-Clone-NAPI/internal/security"
 	"github.com/google/uuid"
 )
 
 const (
 	verificationTokenExpiration = 24
 )
-
-var errFailedPasswordVerification = errors.New("invalid password")
 
 type userSvc struct {
 	userDB  db.UserRepository
@@ -112,9 +109,9 @@ func (u *userSvc) Login(ctx context.Context, loginReq *dtos.LoginRequest) (*dtos
 		return nil, fmt.Errorf("failed to find user: %w", err)
 	}
 
-	validPass := security.CheckHash(loginReq.Password, user.Password)
-	if !validPass {
-		return nil, errFailedPasswordVerification
+	err = security.CheckHash(loginReq.Password, user.Password)
+	if err != nil {
+		return nil, fmt.Errorf("invalid password: %w", err)
 	}
 
 	JWT, expDate, err := security.GenerateTokenWithExp(user.Email)

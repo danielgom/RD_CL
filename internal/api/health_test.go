@@ -13,7 +13,6 @@ type healthSuite struct {
 }
 
 func TestHealth(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &healthSuite{apiSuite{
 		dbName: "health_test",
 	}})
@@ -43,5 +42,4 @@ func (c *healthSuite) TestHealth() {
 
 	c.Equalf(writerResult.StatusCode, http.StatusOK, "Status code should be 200")
 	c.jsonEq(writerResult.Body, string(JSONResponse))
-
 }

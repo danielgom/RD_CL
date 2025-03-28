@@ -14,7 +14,6 @@ type userSuite struct {
 }
 
 func TestUser(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &userSuite{apiSuite{
 		dbName: "user_api_test",
 	}})

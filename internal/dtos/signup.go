@@ -1,8 +1,9 @@
 package dtos
 
 import (
-	"RD-Clone-NAPI/internal/models"
 	"time"
+
+	"RD-Clone-NAPI/internal/models"
 )
 
 // RegisterRequest comes from the signup request.

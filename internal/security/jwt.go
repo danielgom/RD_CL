@@ -1,10 +1,10 @@
 package security
 
 import (
-	"RD-Clone-NAPI/internal/config"
 	"fmt"
 	"time"
 
+	"RD-Clone-NAPI/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 

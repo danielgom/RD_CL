@@ -1,8 +1,6 @@
 package api
 
 import (
-	"RD-Clone-NAPI/internal/config"
-	"RD-Clone-NAPI/internal/testutils"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -12,8 +10,10 @@ import (
 	"net/http/httptest"
 	"strings"
 
+	"RD-Clone-NAPI/internal/config"
+	"RD-Clone-NAPI/internal/db"
 	services "RD-Clone-NAPI/internal/svc"
-
+	"RD-Clone-NAPI/internal/testutils"
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/stretchr/testify/suite"
 )
@@ -40,10 +40,23 @@ func (s *apiSuite) SetupSuite() {
 	config.InitialiseTest(s.pgCont.ConnectionString(), s.dbName)
 
 	api := New()
-	s.server = httptest.NewServer(api.Router())
-	s.handler = api.Router()
 
-	factory := services.NewFactory()
+	pool, err := config.NewDBPool(s.dbName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userRepository := db.NewUserRepository(pool)
+	tokenRepository := db.NewTokenRepository(pool)
+	refreshTokenRepository := db.NewRTRepository(pool)
+
+	refreshTokenService := services.NewRefreshTokenService(refreshTokenRepository)
+	userService := services.NewUserService(userRepository, tokenRepository, refreshTokenService)
+	factory := services.NewFactory(userService, refreshTokenService)
+
+	s.server = httptest.NewServer(api.Router(factory))
+	s.handler = api.Router(factory)
+
 	s.UserHandler = NewUserHandler(factory.UserService, api)
 }
 
@@ -114,8 +127,8 @@ func (s *apiSuite) ResponseEq(method, path string, body io.Reader, exp string, p
 	s.jsonEq(resp.Body, exp, params...)
 }
 
-func (s *apiSuite) jsonEq(got io.Reader, exp string, params ...any) bool {
-	return td.Cmp(s.T(), got, td.Smuggle(json.RawMessage{}, td.JSON(exp, params...)))
+func (s *apiSuite) jsonEq(got io.Reader, exp string, params ...any) {
+	td.Cmp(s.T(), got, td.Smuggle(json.RawMessage{}, td.JSON(exp, params...)))
 }
 
 func (s *apiSuite) PostEq(path, body, exp string, params ...any) {

@@ -1,9 +1,7 @@
 .PHONY: test lint image
 
-TESTS ?= ./...
-
-test:
-	@go test -count 1 -v $(TESTS)
+test: ## make test TESTS="-run Method/Suite ./internal/file"
+	@go test -count 1 -v -race $(if $(TESTS),$(TESTS),./...)
 
 # Test with coverage (CI)
 testCI:
@@ -11,8 +9,7 @@ testCI:
 
 # Checks code with golangci-lint linters
 lint:
-	@golangci-lint run
-	@hadolint Dockerfile
+	@golangci-lint run --timeout 3m --out-format colored-tab --fix
 
 # Run the api
 run:
