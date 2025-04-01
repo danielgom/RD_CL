@@ -16,6 +16,7 @@ func shouldBindIntoAndValidate[T any](r *http.Request, val *T, v *validator.Cust
 	err := json.NewDecoder(r.Body).Decode(val)
 	if err != nil {
 		slog.Warn("failed to parse request body", "error", err)
+
 		return errInvalidBody
 	}
 

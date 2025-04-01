@@ -26,6 +26,7 @@ func NewDBPool(dbName string) (*pgxpool.Pool, error) {
 	}
 
 	intPool = connPool
+
 	err = PingDB()
 	if err != nil {
 		log.Panicln("could not connect to database,", err.Error())
@@ -41,8 +42,10 @@ func PsqlConnString(databaseName ...string) string {
 		if len(databaseName) > 0 {
 			dbName = databaseName[0]
 		}
+
 		connStr := environment.dBConnectionString
 		currConnStr := strings.ReplaceAll(connStr, dbTestBaseName, dbName)
+
 		return currConnStr
 	}
 
@@ -74,6 +77,7 @@ func makeTestDB(dbName string) string {
 	if err := RecreateDB(dbName); err != nil {
 		log.Fatalf("Could not recreate db %s: %s", dbName, err)
 	}
+
 	c := Load()
 	c.SetDBName(dbName)
 

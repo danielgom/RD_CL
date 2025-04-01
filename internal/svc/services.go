@@ -15,6 +15,7 @@ func NewFactory(userService UserService, refreshTokenService RefreshTokenService
 	if userService == nil {
 		panic("userService is required")
 	}
+
 	if refreshTokenService == nil {
 		panic("refreshTokenService is required")
 	}

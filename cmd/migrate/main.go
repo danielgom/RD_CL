@@ -4,7 +4,7 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
+	"log/slog"
 	"os"
 
 	"RD-Clone-NAPI/internal/config"
@@ -12,6 +12,9 @@ import (
 )
 
 func main() {
+	c := config.Load()
+	config.InitialiseLogger(c)
+
 	recreate := flag.Bool("create", false, "drop and create a new database")
 	flag.Parse()
 
@@ -19,23 +22,28 @@ func main() {
 	if flag.Arg(0) != "" {
 		dbname = flag.Arg(0)
 	}
-	fmt.Printf("Migrating database: %s\n", dbname)
+
+	slog.Info("Migrating database", slog.String("dbname", dbname))
 
 	migrateFunc := config.MigrateDB
+
 	if *recreate {
-		fmt.Printf("Rebuilding database: %s\n", dbname)
+		slog.Info("Rebuilding database", slog.String("dbname", dbname))
+
 		migrateFunc = config.RecreateDB
 	}
 
 	err := migrateFunc(dbname)
 	if err == nil {
-		fmt.Println(dbname + " migrated successfully")
+		slog.Info(dbname + " migrated successfully")
 		os.Exit(0)
 	}
+
 	if errors.Is(err, migrate.ErrNoChange) {
-		fmt.Println(dbname + " up to date")
+		slog.Info(dbname + " up to date")
 		os.Exit(0)
 	}
-	fmt.Println(err.Error())
+
+	slog.Error("failed to apply migration successfully", "error", err.Error())
 	os.Exit(1)
 }

@@ -19,7 +19,6 @@ func TestUser(t *testing.T) {
 	}})
 }
 
-//nolint:funlen // Testing function length
 func (u *userSuite) TestUser() {
 	testCases := []struct {
 		name       string
@@ -79,9 +78,10 @@ func (u *userSuite) TestUser() {
 		u.Run(tc.name, func() {
 			w := u.Post("/v1/user/signup", u.toReader(tc.register))
 			writerResult := w.Result()
+
 			defer func() {
 				err := writerResult.Body.Close()
-				u.Nilf(err, "failed to close body")
+				u.NoErrorf(err, "failed to close body")
 			}()
 
 			u.Equalf(tc.statusCode, writerResult.StatusCode, "Status code should be %v", tc.statusCode)

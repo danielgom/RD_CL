@@ -10,6 +10,7 @@ type API struct {
 
 func New() *API {
 	v := validator.GetValidator()
+
 	err := validator.AddValidators(v.Validate)
 	if err != nil {
 		panic(err)

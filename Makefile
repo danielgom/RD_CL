@@ -9,7 +9,7 @@ testCI:
 
 # Checks code with golangci-lint linters
 lint:
-	@golangci-lint run --timeout 3m --out-format colored-tab --fix
+	@golangci-lint run --timeout 3m --fix
 
 # Run the api
 run:

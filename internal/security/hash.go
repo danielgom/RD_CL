@@ -15,6 +15,7 @@ func Hash(str string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could encrypt password %w", err)
 	}
+
 	return string(hStr), nil
 }
 
@@ -24,5 +25,6 @@ func CheckHash(str, hashed string) error {
 	if err != nil {
 		return fmt.Errorf("could not compare hash: %w", err)
 	}
+
 	return nil
 }

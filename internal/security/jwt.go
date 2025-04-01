@@ -23,6 +23,7 @@ func GenerateTokenWithExp(email string) (string, time.Time, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+
 	signedToken, err := token.SignedString([]byte(jwtConfig.Key))
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("could not generate JWT %w please try again", err)

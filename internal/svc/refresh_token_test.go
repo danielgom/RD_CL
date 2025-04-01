@@ -23,8 +23,8 @@ func (u *refreshTokenSuite) TestRefreshToken() {
 	u.refreshTokenRepository.EXPECT().Save(ctx, gomock.Any()).Return(nil)
 
 	token, err := u.refreshTokenService.Create(context.TODO())
-	u.Nilf(err, "failed to create refresh token")
-	u.NotZero(token)
+	u.NoErrorf(err, "failed to create refresh token")
+	u.NotEmpty(token)
 }
 
 func (u *refreshTokenSuite) TestRefreshToken_Create_Error() {
@@ -50,7 +50,7 @@ func (u *refreshTokenSuite) TestRefreshToken_Validate_Success() {
 	u.refreshTokenRepository.EXPECT().FindByToken(ctx, token).Return(refreshToken, nil)
 
 	err := u.refreshTokenService.Validate(ctx, token)
-	u.Nil(err, "validation should succeed for non-expired token")
+	u.NoError(err, "validation should succeed for non-expired token")
 }
 
 func (u *refreshTokenSuite) TestRefreshToken_Validate_TokenExpired() {

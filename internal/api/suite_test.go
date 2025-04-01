@@ -68,6 +68,7 @@ func (s *apiSuite) dt() *td.T {
 	if s.deepTester == nil {
 		s.deepTester = td.NewT(s.T())
 	}
+
 	return s.deepTester
 }
 
@@ -75,22 +76,27 @@ func (s *apiSuite) request(
 	method, path string, body io.Reader,
 ) *http.Response {
 	ctx := context.TODO()
+
 	r, err := http.NewRequestWithContext(ctx, method, s.server.URL+path, body)
 	if err != nil {
 		s.T().Fatal(err)
+
 		return nil
 	}
 
 	resp, err := http.DefaultClient.Do(r)
 	if err != nil {
 		s.T().Fatal(err)
+
 		return nil
 	}
+
 	return resp
 }
 
 func req(method, path string, body io.Reader) *http.Request {
 	req := httptest.NewRequest(method, path, body)
+
 	return req
 }
 
@@ -98,14 +104,17 @@ func (s *apiSuite) Get(path string) *httptest.ResponseRecorder {
 	rs := req("GET", path, nil)
 	w := httptest.NewRecorder()
 	s.handler.ServeHTTP(w, rs)
+
 	return w
 }
 
 func (s *apiSuite) GetWithJWT(path string) *httptest.ResponseRecorder {
 	rs := req("GET", path, nil)
 	rs.Header.Set(AuthorizationTokenHeader, "Bearer "+jwtEx)
+
 	w := httptest.NewRecorder()
 	s.handler.ServeHTTP(w, rs)
+
 	return w
 }
 
@@ -113,6 +122,7 @@ func (s *apiSuite) Post(path string, body io.Reader) *httptest.ResponseRecorder 
 	rs := req("POST", path, body)
 	w := httptest.NewRecorder()
 	s.handler.ServeHTTP(w, rs)
+
 	return w
 }
 
@@ -153,7 +163,8 @@ func (s *apiSuite) NonEmptyString() string {
 
 func (s *apiSuite) toReader(obj any) io.Reader {
 	jsonBytes, err := json.Marshal(obj)
-	s.Nilf(err, "failed to marshal struct")
+	s.NoErrorf(err, "failed to marshal struct")
+
 	return bytes.NewReader(jsonBytes)
 }
 
@@ -162,5 +173,6 @@ func makeString(source any) string {
 	if !ok {
 		log.Fatalf("failed to convert %+v to string", source)
 	}
+
 	return str
 }

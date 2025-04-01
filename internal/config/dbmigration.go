@@ -18,6 +18,7 @@ func RecreateDB(dbname string) error {
 	if err := makeDB(dbname); err != nil {
 		return err
 	}
+
 	return MigrateDB(dbname)
 }
 
@@ -62,6 +63,7 @@ func MigrateDB(dbname string) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to apply migration: %w", err)
 	}
+
 	return nil
 }
 
@@ -87,6 +89,7 @@ func makeDB(dbname string) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to drop database %s: %w", dbname, err)
 	}
+
 	_, err = db.Exec("create database " + dbname)
 	if err != nil {
 		return fmt.Errorf("failed to create database %s: %w", dbname, err)

@@ -18,6 +18,7 @@ func getHealth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("Failed to ping database", "error", err)
 		renderAs(w, r, internalServerError(err))
+
 		return
 	}
 

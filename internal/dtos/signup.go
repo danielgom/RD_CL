@@ -8,10 +8,10 @@ import (
 
 // RegisterRequest comes from the signup request.
 type RegisterRequest struct {
-	Name     string `json:"name" validate:"required"`
+	Name     string `json:"name"      validate:"required"`
 	LastName string `json:"last_name" validate:"required"`
-	Password string `json:"password" validate:"required,password"`
-	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password"  validate:"required,password"`
+	Email    string `json:"email"     validate:"required,email"`
 }
 
 // RegisterResponse is the struct for a successful signUp.

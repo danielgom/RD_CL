@@ -5,7 +5,7 @@ import "time"
 // LoginRequest request to login into the application.
 type LoginRequest struct {
 	UserOrEmail string `json:"user_or_email" validate:"required"`
-	Password    string `json:"password" validate:"required"`
+	Password    string `json:"password"      validate:"required"`
 }
 
 // LoginResponse response from logging in.

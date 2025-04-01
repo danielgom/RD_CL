@@ -17,6 +17,7 @@ func renderAs(w http.ResponseWriter, r *http.Request, v render.Renderer) {
 	err := render.Render(w, r, v)
 	if err != nil {
 		slog.Error("Failed to render", "body", v, "error", err)
+
 		err = render.Render(w, r, internalServerError(err))
 		if err != nil {
 			panic("Failed to render internal server error: " + err.Error())

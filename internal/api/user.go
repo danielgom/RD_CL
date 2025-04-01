@@ -28,12 +28,14 @@ func (h *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	err := shouldBindIntoAndValidate[dtos.RegisterRequest](r, &req, h.api.validator)
 	if err != nil {
 		renderAs(w, r, userError("invalid register request", err.Error()))
+
 		return
 	}
 
 	response, err := h.UsrSvc.SignUp(r.Context(), &req)
 	if err != nil {
 		renderAs(w, r, internalServerError(err))
+
 		return
 	}
 
@@ -47,6 +49,7 @@ func (h *UserHandler) VerifyAccount(w http.ResponseWriter, r *http.Request) {
 	err := h.UsrSvc.VerifyAccount(r.Context(), token)
 	if err != nil {
 		renderAs(w, r, internalServerError(err))
+
 		return
 	}
 
@@ -63,12 +66,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	err := shouldBindIntoAndValidate[dtos.LoginRequest](r, &req, h.api.validator)
 	if err != nil {
 		renderAs(w, r, userError("invalid login request", err.Error()))
+
 		return
 	}
 
 	response, err := h.UsrSvc.Login(r.Context(), &req)
 	if err != nil {
 		renderAs(w, r, internalServerError(err))
+
 		return
 	}
 
@@ -81,12 +86,14 @@ func (h *UserHandler) refreshToken(w http.ResponseWriter, r *http.Request) {
 	err := shouldBindIntoAndValidate[dtos.RefreshTokenRequest](r, &req, h.api.validator)
 	if err != nil {
 		renderAs(w, r, userError("invalid refresh token request", err.Error()))
+
 		return
 	}
 
 	response, err := h.UsrSvc.RefreshToken(r.Context(), &req)
 	if err != nil {
 		renderAs(w, r, internalServerError(err))
+
 		return
 	}
 

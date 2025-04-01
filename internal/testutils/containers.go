@@ -28,6 +28,7 @@ type PGContainer struct {
 func (p *PGContainer) ConnectionString() string {
 	ctx := context.TODO()
 	connStr := p.MustConnectionString(ctx, "sslmode=disable")
+
 	return connStr
 }
 
@@ -37,6 +38,7 @@ func CreatePGContainer() Container {
 
 func postgresContainer() Container {
 	ctx := context.TODO()
+
 	pgCont, err := postgres.Run(ctx, pgImage,
 		postgres.WithDatabase(pgDBName),
 		postgres.WithUsername(pgUsername),
@@ -63,6 +65,7 @@ func (s hostSubstitutor) Description() string {
 
 func (s hostSubstitutor) Substitute(image string) (string, error) {
 	s.ImageHost = ecrHost
+
 	return s.ImageHost + image, nil
 }
 
@@ -73,6 +76,7 @@ func createContainer(createFunc func() Container) Container {
 func withName(name string) testcontainers.CustomizeRequestOption {
 	return func(req *testcontainers.GenericContainerRequest) error {
 		req.Name = name
+
 		return nil
 	}
 }
@@ -80,6 +84,7 @@ func withName(name string) testcontainers.CustomizeRequestOption {
 func mustReuse() testcontainers.CustomizeRequestOption {
 	return func(req *testcontainers.GenericContainerRequest) error {
 		req.Reuse = true
+
 		return nil
 	}
 }

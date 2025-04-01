@@ -95,8 +95,11 @@ func (c *Config) setBaseDir() {
 
 	if c.IsDevelopment() || c.IsCI() {
 		slog.Info("Getting BaseDir from git")
+
 		cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+
 		var stdout bytes.Buffer
+
 		cmd.Stdout = &stdout
 		if err := cmd.Run(); err != nil {
 			log.Fatalln("Could not run git:", err.Error())
@@ -106,6 +109,7 @@ func (c *Config) setBaseDir() {
 		}
 	} else {
 		log.Println("Getting BaseDir from cwd")
+
 		if cwd, err := os.Getwd(); err == nil {
 			c.FileSystem.BaseDir = cwd
 		} else {
@@ -130,10 +134,12 @@ func (c *Config) ServerTimeout() time.Duration {
 	if c.Server.Timeout == "" {
 		return time.Duration(0)
 	}
+
 	d, err := time.ParseDuration(c.Server.Timeout)
 	if err != nil {
 		panic("Invalid Server.Timeout: " + err.Error())
 	}
+
 	return d
 }
 
@@ -141,6 +147,7 @@ func (c *Config) ServerAddress() string {
 	if c.Server.Address == "" {
 		return "localhost:8080"
 	}
+
 	return c.Server.Address
 }
 

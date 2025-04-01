@@ -27,6 +27,7 @@ func (e *Error) Render(_ http.ResponseWriter, r *http.Request) error {
 
 func internalServerError(err error) *Error {
 	slog.Error("request failed", "error", err)
+
 	return &Error{
 		Err:     err,
 		Code:    http.StatusInternalServerError,
@@ -36,6 +37,7 @@ func internalServerError(err error) *Error {
 
 func userError(msg, reason string) *Error {
 	slog.Error("invalid request", "msg", msg, "reason", reason)
+
 	return &Error{
 		Code:    http.StatusBadRequest,
 		Message: msg,

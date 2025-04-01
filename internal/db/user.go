@@ -70,6 +70,7 @@ func (r *userRepo) findUser(ctx context.Context, query string, args ...any) (*mo
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errUsrNotFound
 		}
+
 		return nil, fmt.Errorf("failed to get user row: %w", err)
 	}
 

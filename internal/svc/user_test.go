@@ -47,15 +47,14 @@ func (u *userSuite) TestUserSignup() {
 	u.tokenRepository.EXPECT().Save(ctx, gomock.Any()).Return(nil)
 
 	res, err := u.userService.SignUp(ctx, &req)
-	u.Nilf(err, "failed to sign up")
+	u.NoErrorf(err, "failed to sign up")
 
 	u.Equalf(res.Name, req.Name, "name should be the same")
 	u.Equalf(res.Email, req.Email, "email should be the same")
 	u.Equalf(res.LastName, req.LastName, "last name should be the same")
-	u.Equalf(res.Enabled, int8(0), "user should be disabled")
+	u.Equalf(int8(0), res.Enabled, "user should be disabled")
 }
 
-//nolint:funlen // test data
 func (u *userSuite) TestUserSignupTableDriven() {
 	cases := []struct {
 		name      string
@@ -130,16 +129,19 @@ func (u *userSuite) TestUserSignupTableDriven() {
 		u.Run(tc.name, func() {
 			ctx := context.TODO()
 			tc.mockFunc(ctx)
+
 			res, err := u.userService.SignUp(ctx, &tc.req)
 			if tc.expectErr {
-				u.NotNilf(err, "error expected")
+				u.Errorf(err, "error expected")
+
 				return
 			}
-			u.Nilf(err, "error not expected")
+
+			u.NoErrorf(err, "error not expected")
 			u.Equalf(res.Name, tc.req.Name, "name should be the same")
 			u.Equalf(res.Email, tc.req.Email, "email should be the same")
 			u.Equalf(res.LastName, tc.req.LastName, "last name should be the same")
-			u.Equalf(res.Enabled, int8(0), "user should be disabled")
+			u.Equalf(int8(0), res.Enabled, "user should be disabled")
 		})
 	}
 }
@@ -162,7 +164,7 @@ func (u *userSuite) TestGet() {
 	u.userRepository.EXPECT().FindByUsername(ctx, username).Return(expectedUser, nil)
 
 	response, err := u.userService.Get(ctx, username)
-	u.Nilf(err, "failed to get user")
+	u.NoErrorf(err, "failed to get user")
 	u.NotNil(response, "response should not be nil")
 	u.Equal(expectedUser.ID, response.ID, "ID should match")
 	u.Equal(expectedUser.Name, response.Name, "name should match")
@@ -206,11 +208,12 @@ func (u *userSuite) TestVerifyAccount() {
 	u.tokenRepository.EXPECT().FindByToken(ctx, token).Return(verificationToken, nil)
 	u.userRepository.EXPECT().Update(ctx, gomock.Any()).DoAndReturn(func(_ context.Context, updatedUser *models.User) error {
 		u.Equal(int8(1), updatedUser.Enabled, "user should be enabled")
+
 		return nil
 	})
 
 	err := u.userService.VerifyAccount(ctx, token)
-	u.Nilf(err, "account verification should succeed")
+	u.NoErrorf(err, "account verification should succeed")
 }
 
 func (u *userSuite) TestVerifyAccountFailures() {
@@ -268,7 +271,7 @@ func (u *userSuite) TestLogin() {
 	}
 
 	hash, err := security.Hash("Password1234@@")
-	u.Nilf(err, "failed to hash password")
+	u.NoErrorf(err, "failed to hash password")
 
 	user := &models.User{
 		ID:       1,
@@ -285,7 +288,7 @@ func (u *userSuite) TestLogin() {
 	u.mockRefreshTokenService.EXPECT().Create(ctx).Return(refreshToken, nil)
 
 	response, err := u.userService.Login(ctx, loginReq)
-	u.Nilf(err, "login should succeed")
+	u.NoErrorf(err, "login should succeed")
 	u.NotNil(response, "response should not be nil")
 	u.Equal(user.Email, response.Email, "email should match")
 	u.Equal(user.Email, response.Username, "username should match")
@@ -294,7 +297,6 @@ func (u *userSuite) TestLogin() {
 	u.NotZero(response.ExpiresAt, "expiration time should not be zero")
 }
 
-//nolint:funlen // test data
 func (u *userSuite) TestLoginFailures() {
 	cases := []struct {
 		name     string
@@ -343,7 +345,7 @@ func (u *userSuite) TestLoginFailures() {
 			},
 			mockFunc: func(ctx context.Context, req *dtos.LoginRequest) {
 				hash, err := security.Hash("Password1234@@")
-				u.Nilf(err, "failed to hash password")
+				u.NoErrorf(err, "failed to hash password")
 
 				user := &models.User{
 					Email:    "dga_355@hotmail.com",
@@ -379,7 +381,7 @@ func (u *userSuite) TestRefreshToken() {
 	u.mockRefreshTokenService.EXPECT().Create(ctx).Return(newRefreshToken, nil)
 
 	response, err := u.userService.RefreshToken(ctx, refreshTokenReq)
-	u.Nilf(err, "token refresh should succeed")
+	u.NoErrorf(err, "token refresh should succeed")
 	u.NotNil(response, "response should not be nil")
 	u.Equal(refreshTokenReq.Username, response.Username, "username should match")
 	u.NotEmpty(response.Token, "JWT token should not be empty")
